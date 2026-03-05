@@ -1,10 +1,5 @@
-// export const basepath="http://192.168.156.83:9090/api/"
-// export const basepath="http://192.168.1.42:9090/api/"
+import { BASE_URL, SOCKET_BASE_URL } from './apis/base_url';
 
-// export const basepath="http://ec2-3-7-205-177.ap-south-1.compute.amazonaws.com:9090/api/"
-// export const basepath="https://amigo-be.vercel.app/api/"
-export const basepath = 'http://192.168.1.7:9090/api/';
-// export const baseurl='http://192.168.156.83:9090'
-// export const baseurl='http://192.168.1.42:9090'
-// export const baseurl='http://ec2-3-7-205-177.ap-south-1.compute.amazonaws.com:9090'
-export const baseurl = 'http://192.168.1.7:9090';
+// Keep legacy exports for old JS screens, but source from shared API config.
+export const basepath = `${BASE_URL}/`;
+export const baseurl = SOCKET_BASE_URL;

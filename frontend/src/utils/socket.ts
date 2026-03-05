@@ -1,6 +1,6 @@
 import { DefaultEventsMap } from '@socket.io/component-emitter';
 import { io, Socket } from 'socket.io-client';
-import { ACCESS_TOKEN, PORT } from '../apis/base_url';
+import { SOCKET_BASE_URL } from '../apis/base_url';
 import { AppState, AppStateStatus } from 'react-native';
 
 const MAX_RECONNECT_ATTEMPTS = 10;
@@ -125,7 +125,7 @@ const SocketServices = () => {
                 lastAppState = nextAppState;
             });
 
-            socket = io(`http://${ACCESS_TOKEN}:${PORT}`, {
+            socket = io(SOCKET_BASE_URL, {
                 transports: ['polling', 'websocket'],
                 reconnection: false,
                 timeout: 20000,

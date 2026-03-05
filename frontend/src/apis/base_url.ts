@@ -1,9 +1,12 @@
-// export const ACCESS_TOKEN = '3.110.218.175'; // LIVE
-export const ACCESS_TOKEN = '192.168.1.7'; // LOCAL
+// Local / LAN config (use when mobile/emulator can reach your PC IP)
+export const ACCESS_TOKEN = '192.168.100.28';
 export const PORT = '9090';
-// export const BASE_URL = `https://api.cryptogram.tech/api`;
 export const BASE_URL = `http://${ACCESS_TOKEN}:${PORT}/api`;
+export const SOCKET_BASE_URL = `http://${ACCESS_TOKEN}:${PORT}`;
+
+// Deployed backend
 // export const BASE_URL = `https://amigo-backend-tn0x.onrender.com/api`;
+// export const SOCKET_BASE_URL = BASE_URL.replace(/\/api$/, '');
 // export const BASE_URL = `https://overenvious-variable-archer.ngrok-free.dev/api`;
 // export const BASE_URL = `https://r00vnhcq-9090.inc1.devtunnels.ms/api`;
 // export const BASE_URL = `https://c50qlwx0-9090.asse.devtunnels.ms/api`
