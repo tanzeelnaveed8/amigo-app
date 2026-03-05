@@ -19,11 +19,13 @@ import {VerifyInviteCode} from '../../../../apis/auth/index';
 import BackArrow from '../../../../assets/svg/backArrow';
 import {shadow, shadow3} from '../../../../constants/shadows';
 import useNavigationHook from '../../../../hooks/use_navigation';
+import useTopEnterAnim from '../../../../hooks/useTopEnterAnim';
 
 const EnterVerifyCodeScreen = () => {
   const navigation = useNavigationHook();
   const route = useRoute<any>();
   const {phone, otpToken} = route.params || {};
+  const enterStyle = useTopEnterAnim({ offsetY: -40 });
 
   const [inviteCode, setInviteCode] = useState('');
   const [focused, setFocused] = useState(false);
@@ -106,6 +108,7 @@ const EnterVerifyCodeScreen = () => {
 
   return (
     <SafeAreaView style={styles.safeArea}>
+      <Animated.View style={[{ flex: 1 }, enterStyle]}>
       <KeyboardAvoidingView
         style={{flex: 1}}
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
@@ -188,6 +191,7 @@ const EnterVerifyCodeScreen = () => {
           </View>
         </ScrollView>
       </KeyboardAvoidingView>
+      </Animated.View>
     </SafeAreaView>
   );
 };

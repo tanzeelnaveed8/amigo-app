@@ -1,9 +1,11 @@
-import React, { memo, useCallback, useImperativeHandle, useRef } from 'react';
+import React, { memo, useCallback, useImperativeHandle, useRef, useContext } from 'react';
 import { FlatList, Platform, StyleSheet, View } from 'react-native';
 import ChatContainer from '../atoms/chat-container';
 import RNText from '../atoms/text';
 import fontSize from '../../constants/font-size';
 import fontWeight from '../../constants/font-weight';
+import Context from '../../context';
+import GhostIcon from '../../assets/svg/GhostIcon';
 
 function formatMessageDate(dateKey: string): string {
   const now = new Date();
@@ -29,6 +31,10 @@ interface ChatListProps {
 const ChatList = memo(
   React.forwardRef<FlatList, ChatListProps>(({ data, isLoading, isChanel, isAdmin, onItemPress }, ref) => {
     const innerRef = useRef<FlatList>(null);
+    const ctx = useContext(Context);
+    const colors = ctx?.colors ?? {};
+    const accent = colors.accentColor ?? '#9B7BFF';
+    const secondaryText = colors.secondaryText ?? 'rgba(139,140,173,0.8)';
 
     useImperativeHandle(ref, () => innerRef.current as FlatList);
 
@@ -99,7 +105,22 @@ const ChatList = memo(
           showsVerticalScrollIndicator={false}
           renderItem={renderItem}
           contentContainerStyle={styles.content}
-          ListEmptyComponent={null}
+          ListEmptyComponent={
+            !isLoading
+              ? () => (
+                  <View style={styles.emptyWrap}>
+                    <GhostIcon width={72} height={72} strokeColor={accent} />
+                    <RNText
+                      label="No chats found"
+                      fontSize={fontSize._14}
+                      fontWeight={fontWeight._500}
+                      color={secondaryText}
+                      style={{ marginTop: 10 }}
+                    />
+                  </View>
+                )
+              : null
+          }
           initialNumToRender={15}
           maxToRenderPerBatch={10}
           updateCellsBatchingPeriod={50}
@@ -123,6 +144,13 @@ const styles = StyleSheet.create({
   },
   content: {
     paddingBottom: 10,
+  },
+  emptyWrap: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 40,
+    gap: 8,
   },
   datePillWrap: {
     alignItems: 'center',

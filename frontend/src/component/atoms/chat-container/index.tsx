@@ -14,6 +14,7 @@ import AudioPlayer from './audio-player';
 import fontSize from '../../../constants/font-size';
 import fontWeight from '../../../constants/font-weight';
 import Context from '../../../context';
+import GhostIcon from '../../../assets/svg/GhostIcon';
 
 // Uisample: own gradient from theme, other from theme cardBg
 const BUBBLE_FALLBACK = {
@@ -55,6 +56,7 @@ interface ChatContainerProps {
 
 const ChatContainer = (props: ChatContainerProps) => {
   const {
+    id,
     message,
     person,
     type,
@@ -82,6 +84,7 @@ const ChatContainer = (props: ChatContainerProps) => {
 
   const maxBubbleWidth = screenWidth * BUBBLE_FALLBACK.maxWidthPercent;
   const isOwn = person === 'sender';
+  const isPending = typeof id === 'string' && id.startsWith('opt-');
 
   // Uisample grouped radius: first in group = 20px outer, last = 4px inner
   const r = BUBBLE_FALLBACK.radiusBig;
@@ -154,6 +157,9 @@ const ChatContainer = (props: ChatContainerProps) => {
       <View style={styles.footer}>
         {seenBy != null && (
           <RNText label={seenBy} fontSize={fontSize._10} fontWeight={fontWeight._500} color={timeColor} style={styles.seenBy} />
+        )}
+        {isOwn && isPending && (
+          <GhostIcon width={14} height={14} strokeColor={timeColor} />
         )}
         <RNText label={time ?? '10:00 am'} fontSize={fontSize._10} fontWeight={fontWeight._500} color={timeColor} />
       </View>

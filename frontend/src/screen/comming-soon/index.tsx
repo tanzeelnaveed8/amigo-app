@@ -7,6 +7,7 @@ import {
   Text,
   TouchableOpacity,
   View,
+  Animated,
 } from 'react-native';
 import {
   ArrowLeft,
@@ -20,6 +21,7 @@ import {FontFamily} from '../../../GlobalStyles';
 import useNavigationHook from '../../hooks/use_navigation';
 import {Image as FastImage} from 'expo-image';
 import Context from '../../context';
+import useTopEnterAnim from '../../hooks/useTopEnterAnim';
 
 const TABS = ['All', 'Missed'];
 
@@ -28,6 +30,7 @@ const ComingSoonScreen = () => {
   const { colors } = useContext(Context);
   const [activeTab, setActiveTab] = useState(0);
   const [callHistory] = useState<any[]>([]);
+  const enterStyle = useTopEnterAnim({ offsetY: -40 });
 
   const filteredCalls =
     activeTab === 1
@@ -87,7 +90,7 @@ const ComingSoonScreen = () => {
 
   return (
     <SafeAreaView style={[styles.safeArea, { backgroundColor: colors.bgColor }]}>
-      <View style={[styles.container, { backgroundColor: colors.bgColor }]}>
+      <Animated.View style={[styles.container, { backgroundColor: colors.bgColor }, enterStyle]}>
         {/* Header */}
         <View style={styles.header}>
           <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backBtn}>
@@ -120,7 +123,7 @@ const ComingSoonScreen = () => {
           contentContainerStyle={filteredCalls.length === 0 ? {flex: 1} : {paddingBottom: 20}}
           showsVerticalScrollIndicator={false}
         />
-      </View>
+      </Animated.View>
     </SafeAreaView>
   );
 };

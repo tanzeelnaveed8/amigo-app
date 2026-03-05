@@ -25,6 +25,7 @@ import {
   verifyRazorpayPayment,
 } from '../../../../apis/razorpay';
 import { RAZORPAY_KEY_ID } from '../../../../apis/base_url';
+import useTopEnterAnim from '../../../../hooks/useTopEnterAnim';
 
 const PAYMENT_AMOUNT = 50;
 
@@ -33,6 +34,7 @@ const PremiumAccessPassScreen = () => {
   const route = useRoute<any>();
   const {phone, otpToken} = route.params || {};
   const userData: any = useSelector((state: any) => state.loginData);
+  const enterStyle = useTopEnterAnim({ offsetY: -40 });
   const [isLoading, setIsLoading] = useState(false);
   const [paymentStatus, setPaymentStatus] = useState<
     'idle' | 'processing' | 'success' | 'failed'
@@ -182,9 +184,10 @@ const PremiumAccessPassScreen = () => {
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      <ScrollView
-        contentContainerStyle={styles.scrollContent}
-        showsVerticalScrollIndicator={false}>
+      <Animated.View style={[{ flex: 1 }, enterStyle]}>
+        <ScrollView
+          contentContainerStyle={styles.scrollContent}
+          showsVerticalScrollIndicator={false}>
         <TouchableOpacity
           style={styles.backButton}
           onPress={() => navigation.goBack()}
@@ -286,7 +289,8 @@ const PremiumAccessPassScreen = () => {
             </TouchableOpacity>
           </View>
         </View>
-      </ScrollView>
+        </ScrollView>
+      </Animated.View>
     </SafeAreaView>
   );
 };

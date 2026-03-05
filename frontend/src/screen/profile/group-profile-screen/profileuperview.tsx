@@ -87,7 +87,7 @@ export const ProfileUperView = (p: props) => {
                         <ChevronLeft size={24} color={colors.secondaryText} />
                     </TouchableOpacity>
                     {isSettingshow ? (
-                        <TouchableOpacity onPress={omHeaderRightIcon} activeOpacity={0.8} style={local.topIconBtn}>
+                    <TouchableOpacity onPress={onSettingIconPress} activeOpacity={0.8} style={local.topIconBtn}>
                             <Settings size={20} color={colors.textColor} />
                         </TouchableOpacity>
                     ) : (
@@ -102,7 +102,7 @@ export const ProfileUperView = (p: props) => {
                     <RNText label="Room" fontSize={34} fontWeight={fontWeight._700} color={colors.textColor} style={local.roomWord} />
                     <RNText label={title} fontSize={34} fontWeight={fontWeight._700} color={accent} style={local.nameLine} />
                 </View>
-                <TouchableOpacity onPress={isSettingshow ? onProfileIcon : () => {}} activeOpacity={0.85} style={local.avatarWrap}>
+                <TouchableOpacity onPress={() => {}} activeOpacity={0.85} style={local.avatarWrap}>
                     <View style={local.avatarGlowBg} />
                     {avatarUri ? (
                         <FastImage source={{ uri: avatarUri }} style={local.avatar} />

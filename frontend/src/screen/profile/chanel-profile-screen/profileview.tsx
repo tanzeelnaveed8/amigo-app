@@ -194,7 +194,7 @@ export const ProfileUperView = (p: props) => {
                         />
                     </View>
                     <TouchableOpacity
-                        onPress={isSettingshow ? onProfileIcon : () => {}}
+                        onPress={() => {}}
                         activeOpacity={0.85}
                         style={s.avatarWrap}
                     >

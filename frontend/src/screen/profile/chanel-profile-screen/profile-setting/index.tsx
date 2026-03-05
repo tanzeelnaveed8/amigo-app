@@ -38,6 +38,7 @@ import fontSize from '../../../../constants/font-size'
 import fontWeight from '../../../../constants/font-weight'
 import { DeleteChanel, UpdateChanel, UpdateChanelProfilepic } from '../../../../apis/channel'
 import { getQrPayload } from '../../../../apis/qr'
+import useTopEnterAnim from '../../../../hooks/useTopEnterAnim'
 
 // Pulsing glow for dialogs
 const PulsingCircle = ({ color }: { color: string }) => {
@@ -87,6 +88,7 @@ const ChanelProfileSettingScreen = () => {
     const profileData = route?.profileData ?? {}
     const { colors, setToastMsg, setLoader } = useContext(Context)
     const accent = colors.accentColor ?? '#3B82F6'
+    const enterStyle = useTopEnterAnim({ offsetY: -40 })
 
     // Signal info state
     const [signalName, setSignalName] = useState<string>(profileData?.title ?? '')
@@ -195,7 +197,7 @@ const ChanelProfileSettingScreen = () => {
     }
 
     return (
-        <View style={[s.root, { backgroundColor: colors.primary }]}>
+        <Animated.View style={[s.root, { backgroundColor: colors.primary }, enterStyle]}>
             {/* ── Header ── */}
             <SafeAreaView>
                 <View style={[s.header, { marginTop: Platform.OS === 'android' ? 10 : 0 }]}>
@@ -526,7 +528,7 @@ const ChanelProfileSettingScreen = () => {
                     </Pressable>
                 </Pressable>
             </Modal>
-        </View>
+        </Animated.View>
     )
 }
 

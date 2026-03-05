@@ -1,4 +1,4 @@
-import {FlatList, Pressable, SafeAreaView, View} from 'react-native';
+import {Animated, FlatList, Pressable, SafeAreaView, View} from 'react-native';
 import React, {useContext} from 'react';
 import Header from '../../../component/atoms/header';
 import RNText from '../../../component/atoms/text';
@@ -12,12 +12,14 @@ import {useMutation} from 'react-query';
 import {UpdateProfile} from '../../../apis/auth';
 import {useDispatch, useSelector} from 'react-redux';
 import {loginAction} from '../../../redux/actions';
+import useTopEnterAnim from '../../../hooks/useTopEnterAnim';
 
 const AccountTypeScreen = () => {
   const navigation = useNavigationHook();
   const {setLoader, colors} = useContext(Context);
   const userData: any = useSelector((state: any) => state.loginData);
   const dispatch = useDispatch();
+  const enterStyle = useTopEnterAnim({ offsetY: -40 });
 
   const {mutate} = useMutation(UpdateProfile, {
     onSuccess: res => {
@@ -32,7 +34,7 @@ const AccountTypeScreen = () => {
   });
 
   return (
-    <View style={[styles.container, {backgroundColor: colors.primary}]}>
+    <Animated.View style={[styles.container, {backgroundColor: colors.primary}, enterStyle]}>
       <SafeAreaView>
         <Header title="Amigo" onLeftIconPress={navigation.goBack} />
       </SafeAreaView>
@@ -77,7 +79,7 @@ const AccountTypeScreen = () => {
           />
         </View>
       </View>
-    </View>
+    </Animated.View>
   );
 };
 

@@ -1,7 +1,7 @@
 import React from 'react'
 import { createStackNavigator } from '@react-navigation/stack';
 import SplashScreen from '../screens/SplashScreen';
-import AnimatedSplashScreen from '../screens/Ghost/GhostModeSplashScreen';
+// NOTE: This navigator is legacy (not the app entry). Keep routes stable, but don't show Ghost splash by default.
 import AddChanelMember from '../screens/Chanel/AddChanelMember';
 import ChanelAddministrator from '../screens/Chanel/ChanelAddministrator';
 import ChanelChatBox from '../screens/Chanel/ChanelChatBox';
@@ -44,8 +44,7 @@ const StackNavigator = () => {
     // const token = useSelector(state => state.user.token)
 
     return (
-        <Stack.Navigator initialRouteName='Animated Splash Screen' screenOptions={{ headerShown: false }}>
-            <Stack.Screen name="Animated Splash Screen" component={AnimatedSplashScreen} />
+        <Stack.Navigator initialRouteName='Splash Screen' screenOptions={{ headerShown: false }}>
             <Stack.Screen name="Splash Screen" component={SplashScreen} />
 
          

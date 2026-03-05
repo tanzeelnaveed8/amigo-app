@@ -42,7 +42,6 @@ import CommunityGuidelinesScreen from '../screen/setting-screen/community-guidel
 import BlockedUsersScreen from '../screen/setting-screen/blocked-users';
 import WalletScreen from '../screen/wallet-screen';
 import ShareItScreen from '../screen/shareit-screen';
-import AnimatedSplashScreen from '../screens/AnimatedSplashScreen';
 import ChooseGhostNameScreen from '../screens/Ghost/ChooseGhostNameScreen';
 import ChooseModeScreen from '../screens/Ghost/ChooseModeScreen';
 import CreateCrowdScreen from '../screens/Ghost/CreateCrowdScreen';
@@ -64,6 +63,7 @@ import MyDrawer from './drawer-navigation';
 
 const Navigation = () => {
   const userData: any = useSelector((state: any) => state.loginData);
+  const hasUser = !!(userData?.data?.userName || userData?.data?.token || userData?.token);
   const Stack = createNativeStackNavigator<RootStackParamList>();
   const { setColors, setDarkMode, setThemeMode, colors } = useContext(Context);
   const isDark = colors?.bgColor === '#0A0A14' || (colors?.bgColor && String(colors.bgColor).includes('0A0A'));
@@ -141,17 +141,12 @@ const Navigation = () => {
         backgroundColor={colors?.bgColor ?? '#0A0A14'}
       />
     <Stack.Navigator
-      initialRouteName={'AnimatedSplashScreen' as any}
+      initialRouteName={(hasUser ? 'MyDrawer' : 'ChooseModeScreen') as any}
       screenOptions={{
         headerShown: false,
         animation: 'slide_from_right',
         animationDuration: 250,
       }}>
-      <Stack.Screen
-        name={'AnimatedSplashScreen' as any}
-        component={AnimatedSplashScreen}
-        options={{animation: 'fade'}}
-      />
       <Stack.Screen
         name="GhostModeSplashScreen"
         component={GhostModeSplashScreen}
@@ -210,60 +205,70 @@ const Navigation = () => {
         name={'GhostSettingsScreen' as any}
         component={GhostSettingsScreen}
       />
-      <Stack.Screen name="RegisterScreen" component={RegisterScreen} />
+      <Stack.Screen name="RegisterScreen" component={RegisterScreen} options={{ animation: 'fade' }} />
       <Stack.Screen
         name="RegisterUserScreen"
         component={RegisterUserScreen}
+        options={{ animation: 'fade' }}
       />
-      <Stack.Screen name="OtpScreen" component={OtpScreen} />
-      <Stack.Screen name="AccessRequiredScreen" component={AccessRequiredScreen} />
-      <Stack.Screen name="PremiumAccessPassScreen" component={PremiumAccessPassScreen} />
-      <Stack.Screen name="EnterVerifyCodeScreen" component={EnterVerifyCodeScreen} />
-      <Stack.Screen name="VerifyOtpScreen" component={VerifyOtpScreen} />
-      <Stack.Screen name="UserDetailScreen" component={UserDetailScreen} />
+      <Stack.Screen name="OtpScreen" component={OtpScreen} options={{ animation: 'fade' }} />
+      <Stack.Screen name="AccessRequiredScreen" component={AccessRequiredScreen} options={{ animation: 'fade' }} />
+      <Stack.Screen name="PremiumAccessPassScreen" component={PremiumAccessPassScreen} options={{ animation: 'fade' }} />
+      <Stack.Screen name="EnterVerifyCodeScreen" component={EnterVerifyCodeScreen} options={{ animation: 'fade' }} />
+      <Stack.Screen name="VerifyOtpScreen" component={VerifyOtpScreen} options={{ animation: 'fade' }} />
+      <Stack.Screen name="UserDetailScreen" component={UserDetailScreen} options={{ animation: 'fade' }} />
       <Stack.Screen
         name="ContactSyncPermission"
         component={ContactSyncPermission}
+        options={{ animation: 'fade' }}
       />
-      <Stack.Screen name="MyDrawer" component={MyDrawer} />
-      <Stack.Screen name="AccountTypeScreen" component={AccountTypeScreen} />
+      <Stack.Screen name="MyDrawer" component={MyDrawer} options={{ animation: 'fade' }} />
+      <Stack.Screen name="AccountTypeScreen" component={AccountTypeScreen} options={{ animation: 'fade' }} />
       <Stack.Screen name="ChatScreen" component={ChatScreen} options={{animation: 'slide_from_bottom'}} />
-      <Stack.Screen name="ContactListScreen" component={ContactListScreen} />
-      <Stack.Screen name="CreateNewScreen" component={CreateNewScreen} />
-      <Stack.Screen name="CreateRoomSignalFormScreen" component={CreateRoomSignalFormScreen} />
-      <Stack.Screen name="GroupTypeScreen" component={GroupTypeScreen} />
-      <Stack.Screen name="AddMemberScreen" component={AddMemberScreen} />
+      <Stack.Screen
+        name="ContactListScreen"
+        component={ContactListScreen}
+        options={{ animation: 'fade' }}
+      />
+      <Stack.Screen name="CreateNewScreen" component={CreateNewScreen} options={{ animation: 'fade' }} />
+      <Stack.Screen name="CreateRoomSignalFormScreen" component={CreateRoomSignalFormScreen} options={{ animation: 'fade' }} />
+      <Stack.Screen name="GroupTypeScreen" component={GroupTypeScreen} options={{ animation: 'fade' }} />
+      <Stack.Screen name="AddMemberScreen" component={AddMemberScreen} options={{ animation: 'fade' }} />
       <Stack.Screen
         name="AddGroupDetailsScreen"
         component={AddGroupDetailsScreen}
+        options={{ animation: 'fade' }}
       />
-      <Stack.Screen name="SettingScreen" component={SettingScreen} />
-      <Stack.Screen name="SecurityDataScreen" component={SecurityDataScreen} />
-      <Stack.Screen name="CommunityGuidelinesScreen" component={CommunityGuidelinesScreen} />
-      <Stack.Screen name="BlockedUsersScreen" component={BlockedUsersScreen} />
-      <Stack.Screen name="InviteScreen" component={InviteScreen} />
-      <Stack.Screen name="WalletScreen" component={WalletScreen} />
-      <Stack.Screen name="ShareItScreen" component={ShareItScreen} />
-      <Stack.Screen name="ComingSoonScreen" component={ComingSoonScreen} />
-      <Stack.Screen name="ProfileScreen" component={ProfileScreen} />
-      <Stack.Screen name="RoomMembersScreen" component={RoomMembersScreen} />
+      <Stack.Screen name="SettingScreen" component={SettingScreen} options={{ animation: 'fade' }} />
+      <Stack.Screen name="SecurityDataScreen" component={SecurityDataScreen} options={{ animation: 'fade' }} />
+      <Stack.Screen name="CommunityGuidelinesScreen" component={CommunityGuidelinesScreen} options={{ animation: 'fade' }} />
+      <Stack.Screen name="BlockedUsersScreen" component={BlockedUsersScreen} options={{ animation: 'fade' }} />
+      <Stack.Screen name="InviteScreen" component={InviteScreen} options={{ animation: 'fade' }} />
+      <Stack.Screen name="WalletScreen" component={WalletScreen} options={{ animation: 'fade' }} />
+      <Stack.Screen name="ShareItScreen" component={ShareItScreen} options={{ animation: 'fade' }} />
+      <Stack.Screen name="ComingSoonScreen" component={ComingSoonScreen} options={{ animation: 'fade' }} />
+      <Stack.Screen name="ProfileScreen" component={ProfileScreen} options={{ animation: 'fade' }} />
+      <Stack.Screen name="RoomMembersScreen" component={RoomMembersScreen} options={{ animation: 'fade' }} />
       <Stack.Screen
         name="ProfileSettingScreen"
         component={ProfileSettingScreen}
+        options={{ animation: 'fade' }}
       />
       <Stack.Screen
         name="ChanelProfileScreen"
         component={ChanelProfileScreen}
+        options={{ animation: 'fade' }}
       />
       <Stack.Screen
         name="ChanelProfileSettingScreen"
         component={ChanelProfileSettingScreen}
+        options={{ animation: 'fade' }}
       />
-      <Stack.Screen name="EditFlowMemberList" component={EditFlowMemberList} />
+      <Stack.Screen name="EditFlowMemberList" component={EditFlowMemberList} options={{ animation: 'fade' }} />
       <Stack.Screen name="DmChatScreen" component={DmChatScreen} options={{animation: 'slide_from_bottom'}} />
       <Stack.Screen name="ChanelChatScreen" component={ChanelChatScreen} options={{animation: 'slide_from_bottom'}} />
-      <Stack.Screen name="DmProfileScreen" component={DmProfileScreen} />
-      <Stack.Screen name="ProfileQRScreen" component={ProfileQRScreen} />
+      <Stack.Screen name="DmProfileScreen" component={DmProfileScreen} options={{ animation: 'fade' }} />
+      <Stack.Screen name="ProfileQRScreen" component={ProfileQRScreen} options={{ animation: 'fade' }} />
     </Stack.Navigator>
     </>
   );

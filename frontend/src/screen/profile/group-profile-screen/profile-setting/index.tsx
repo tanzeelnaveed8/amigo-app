@@ -26,6 +26,7 @@ import Context from '../../../../context'
 import RNText from '../../../../component/atoms/text'
 import fontSize from '../../../../constants/font-size'
 import fontWeight from '../../../../constants/font-weight'
+import useTopEnterAnim from '../../../../hooks/useTopEnterAnim'
 
 const CORNER_SIZE = 26
 const CORNER_OFFSET = 10
@@ -56,6 +57,7 @@ const ProfileSettingScreen = () => {
     const profileData = route?.profileData ?? {}
     const { colors, setLoader, setToastMsg } = useContext(Context)
     const styles = useMemo(() => getStyles(colors), [colors])
+    const enterStyle = useTopEnterAnim({ offsetY: -40 })
 
     const groupId = profileData?._id ?? profileData?.id
     const participantsCount = Array.isArray(profileData?.participants) ? profileData.participants.length : 0
@@ -150,7 +152,7 @@ const ProfileSettingScreen = () => {
     const onDeleteRoom = () => setShowDeleteDialog(true)
 
     return (
-        <View style={styles.container}>
+        <Animated.View style={[styles.container, enterStyle]}>
             <SafeAreaView>
                 <View style={styles.header}>
                     <TouchableOpacity onPress={navigation.goBack} activeOpacity={0.85} style={styles.backBtn}>
@@ -491,7 +493,7 @@ const ProfileSettingScreen = () => {
                     </Pressable>
                 </Pressable>
             </Modal>
-        </View>
+        </Animated.View>
     )
 }
 

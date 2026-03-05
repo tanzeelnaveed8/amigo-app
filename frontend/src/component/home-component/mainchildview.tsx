@@ -7,8 +7,9 @@ import {
   Platform,
   StyleSheet,
   Keyboard,
+  Animated,
 } from 'react-native';
-import React, { memo, useContext } from 'react';
+import React, { memo, useContext, useRef } from 'react';
 import { DrawerActions } from '@react-navigation/native';
 import { LinearGradient } from 'expo-linear-gradient';
 import useNavigationHook from '../../hooks/use_navigation';
@@ -52,12 +53,30 @@ const MainChildrenView = (props: MainChildrenViewProps) => {
   const isDark = themeColors.bgColor === '#0A0A14' || (themeColors.bgColor && String(themeColors.bgColor).includes('0A0A'));
   const accent = themeColors.accentColor ?? '#9B7BFF';
   const accentLight = themeColors.accentLight ?? '#7C5FD4';
+  const ghostTapAnim = useRef(new Animated.Value(0)).current;
 
   const handleDrawerPress = () => {
     navigation.dispatch(DrawerActions.openDrawer());
   };
 
+  const runGhostTapAnimation = () => {
+    ghostTapAnim.setValue(0);
+    Animated.sequence([
+      Animated.timing(ghostTapAnim, {
+        toValue: 1,
+        duration: 180,
+        useNativeDriver: true,
+      }),
+      Animated.timing(ghostTapAnim, {
+        toValue: 0,
+        duration: 180,
+        useNativeDriver: true,
+      }),
+    ]).start();
+  };
+
   const cycleTheme = () => {
+    runGhostTapAnimation();
     if (themeMode === 'day') setThemeMode?.('dark');
     else if (themeMode === 'dark') setThemeMode?.('ghost');
     else setThemeMode?.('day');
@@ -90,11 +109,30 @@ const MainChildrenView = (props: MainChildrenViewProps) => {
           ]}
           hitSlop={12}
         >
-          {themeMode === 'day' ? (
-            <Moon size={22} color={accent} />
-          ) : (
-            <Ghost size={22} color={accent} />
-          )}
+          <Animated.View
+            style={{
+              transform: [
+                {
+                  scale: ghostTapAnim.interpolate({
+                    inputRange: [0, 1],
+                    outputRange: [1, 1.18],
+                  }),
+                },
+                {
+                  rotate: ghostTapAnim.interpolate({
+                    inputRange: [0, 1],
+                    outputRange: ['0deg', '12deg'],
+                  }),
+                },
+              ],
+            }}
+          >
+            {themeMode === 'day' ? (
+              <Moon size={22} color={accent} />
+            ) : (
+              <Ghost size={22} color={accent} />
+            )}
+          </Animated.View>
         </Pressable>
       </View>
 

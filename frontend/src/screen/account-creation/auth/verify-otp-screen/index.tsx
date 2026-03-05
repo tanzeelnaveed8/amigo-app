@@ -3,6 +3,7 @@ import {CheckCircle2, Send, Shield} from 'lucide-react-native';
 import React, {useEffect, useRef, useState} from 'react';
 import {
   ActivityIndicator,
+  Animated,
   Keyboard,
   Platform,
   SafeAreaView,
@@ -21,6 +22,8 @@ import {shadow, shadow2} from '../../../../constants/shadows';
 import useNavigationHook from '../../../../hooks/use_navigation';
 import {useDispatch} from 'react-redux';
 import {loginAction} from '../../../../redux/actions';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import useTopEnterAnim from '../../../../hooks/useTopEnterAnim';
 
 const VerifyOtpScreen = () => {
   const navigation = useNavigationHook();
@@ -28,6 +31,7 @@ const VerifyOtpScreen = () => {
   const dispatch = useDispatch();
   const {phone, inviteCode, inviteData, flowType, email, userId} =
     route.params || {};
+  const enterStyle = useTopEnterAnim({ offsetY: -40 });
 
   const [otp, setOtp] = useState(['', '', '', '', '', '']);
   const inputRefs = useRef<Array<TextInput | null>>([]);
@@ -80,6 +84,11 @@ const VerifyOtpScreen = () => {
       console.log('OTP verified successfully:', response);
 
       if (flowType === 'login') {
+        try {
+          if (response?.refreshToken) {
+            await AsyncStorage.setItem('refreshToken', response.refreshToken);
+          }
+        } catch {}
         dispatch(loginAction({...response}));
         navigation.reset({
           index: 0,
@@ -154,6 +163,7 @@ const VerifyOtpScreen = () => {
 
   return (
     <SafeAreaView style={styles.safeArea}>
+      <Animated.View style={[{ flex: 1 }, enterStyle]}>
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
         <KeyboardAwareScrollView
           contentContainerStyle={styles.scrollContent}
@@ -249,6 +259,7 @@ const VerifyOtpScreen = () => {
           </View>
         </KeyboardAwareScrollView>
       </TouchableWithoutFeedback>
+      </Animated.View>
     </SafeAreaView>
   );
 };

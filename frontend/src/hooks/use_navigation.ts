@@ -1,7 +1,6 @@
 import {NavigationProp, useNavigation} from '@react-navigation/native';
 
 export type RootStackParamList = {
-  AnimatedSplashScreen: undefined;
   GhostModeSplashScreen: undefined;
   WelcomeToGhostMode: undefined;
   TermsAgreementScreen: {ghostName?: string; avatarBgColor?: string};

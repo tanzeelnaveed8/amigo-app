@@ -13,6 +13,7 @@ import {
   Linking,
   Alert,
   Animated,
+  Easing,
   ActivityIndicator,
   Share,
 } from 'react-native';
@@ -30,6 +31,7 @@ import {
   Ghost,
   Lock,
   Bell,
+  Users,
   ChevronRight,
   Shield,
   BookOpen,
@@ -53,6 +55,7 @@ import { loginAction } from '../../redux/actions';
 import { _isEmpty } from '../../utils/helper';
 import * as ImagePicker from '../../utils/imagePickerCompat';
 import { openCropper as ImageCropPickerOpenCropper } from '../../utils/imagePickerCompat';
+import { useFocusEffect } from '@react-navigation/native';
 
 const getInitials = (firstName?: string, lastName?: string) => {
   const first = firstName?.trim()?.[0]?.toUpperCase() || '';
@@ -99,6 +102,22 @@ const SettingScreen = () => {
   // Pulsing animation for QR center icon
   const glowAnim = useRef(new Animated.Value(0.35)).current;
   const scaleAnim = useRef(new Animated.Value(1)).current;
+  const enterAnim = useRef(new Animated.Value(0)).current;
+
+  useFocusEffect(
+    React.useCallback(() => {
+      enterAnim.setValue(0);
+      const timer = setTimeout(() => {
+        Animated.timing(enterAnim, {
+          toValue: 1,
+          duration: 520,
+          easing: Easing.out(Easing.cubic),
+          useNativeDriver: true,
+        }).start();
+      }, 80);
+      return () => clearTimeout(timer);
+    }, [enterAnim]),
+  );
 
   useEffect(() => {
     const loop = Animated.loop(
@@ -289,7 +308,22 @@ const SettingScreen = () => {
 
   return (
     <SafeAreaView style={s.safe}>
-      <View style={s.container}>
+      <Animated.View
+        style={[
+          s.container,
+          {
+            opacity: enterAnim,
+            transform: [
+              {
+                translateY: enterAnim.interpolate({
+                  inputRange: [0, 1],
+                  outputRange: [-40, 0],
+                }),
+              },
+            ],
+          },
+        ]}
+      >
 
         {/* ── Header ── */}
         <View style={s.header}>
@@ -521,6 +555,15 @@ const SettingScreen = () => {
 
           {/* ── MORE ── */}
           <Text style={s.sectionTitle}>MORE</Text>
+          <TouchableOpacity style={s.rowButton} onPress={() => navigation.navigate('ContactListScreen')} activeOpacity={0.7}>
+            <View style={s.accountLeft}>
+              <View style={[s.iconCircle, { backgroundColor: `${accent}1A` }]}>
+                <Users size={20} color={accent} />
+              </View>
+              <Text style={s.accountTitle}>Contacts</Text>
+            </View>
+            <ChevronRight size={20} color={colors.secondaryText ?? '#5E607E'} />
+          </TouchableOpacity>
           <TouchableOpacity style={s.rowButton} onPress={() => navigation.navigate('SecurityDataScreen')} activeOpacity={0.7}>
             <View style={s.accountLeft}>
               <View style={[s.iconCircle, { backgroundColor: `${accent}1A` }]}>
@@ -627,7 +670,7 @@ const SettingScreen = () => {
           </View>
 
         </ScrollView>
-      </View>
+      </Animated.View>
 
       {/* ── QR Modal ── */}
       <Modal

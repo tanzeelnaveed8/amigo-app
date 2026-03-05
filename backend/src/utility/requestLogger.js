@@ -1,7 +1,9 @@
 const  colors = require("colors");
 
 const requestLogger = (req, res, next) => {
- console.log("Request Logger",req.body);
+  console.log(`\n=== Request Logger ===`.green.bold);
+  console.log(`Method: ${req.method}  URL: ${req.originalUrl}`.cyan);
+  console.log("Request Logger", req.body);
   if (req.query && Object.keys(req.query).length > 0) {
     console.log(`Request query: ${JSON.stringify(req.query)}`.bgYellow);
   } else {

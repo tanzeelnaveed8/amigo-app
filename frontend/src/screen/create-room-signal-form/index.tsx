@@ -9,6 +9,7 @@ import {
   SafeAreaView,
   Platform,
   Alert,
+  Animated,
 } from 'react-native';
 import { Image as FastImage } from 'expo-image';
 import { ArrowLeft, Camera, Image as ImageIcon } from 'lucide-react-native';
@@ -16,12 +17,14 @@ import useNavigationHook from '../../hooks/use_navigation';
 import Context from '../../context';
 import * as ImagePicker from '../../utils/imagePickerCompat';
 import { _isEmpty } from '../../utils/helper';
+import useTopEnterAnim from '../../hooks/useTopEnterAnim';
 
 const CreateRoomSignalFormScreen = () => {
   const navigation = useNavigationHook();
   const { colors, conversationType, setToastMsg } = useContext(Context);
   const isDark = colors?.bgColor === '#0A0A14' || (colors?.bgColor && String(colors.bgColor).includes('0A0A'));
   const accent = colors?.accentColor ?? '#9B7BFF';
+  const enterStyle = useTopEnterAnim({ offsetY: -40 });
 
   const isRoom = conversationType === 'GROUP';
   const [name, setName] = useState('');
@@ -76,7 +79,7 @@ const CreateRoomSignalFormScreen = () => {
 
   return (
     <SafeAreaView style={[styles.safe, { backgroundColor: bg }]}>
-      <View style={styles.container}>
+      <Animated.View style={[styles.container, enterStyle]}>
         <View style={styles.header}>
           <Pressable onPress={() => navigation.goBack()} style={({ pressed }) => [styles.backBtn, pressed && { opacity: 0.7 }]}>
             <ArrowLeft size={21} color={isDark ? '#FFFFFF' : '#111827'} />
@@ -160,7 +163,7 @@ const CreateRoomSignalFormScreen = () => {
             <Text style={styles.continueBtnText}>Continue</Text>
           </Pressable>
         </ScrollView>
-      </View>
+      </Animated.View>
     </SafeAreaView>
   );
 };

@@ -1,11 +1,14 @@
 import React, { useContext } from 'react';
+import { Animated } from 'react-native';
 import OtpComponent from '../../../../component/otp-component';
 import useNavigationHook from '../../../../hooks/use_navigation';
 import Context from '../../../../context';
 import { VerifyMsg91Otp, SendMsg91Otp } from '../../../../apis/auth';
 import { useDispatch } from 'react-redux';
 import { loginAction } from '../../../../redux/actions';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useRoute } from '@react-navigation/native';
+import useTopEnterAnim from '../../../../hooks/useTopEnterAnim';
 
 const OtpScreen = () => {
   const navigation: any = useNavigationHook();
@@ -13,6 +16,7 @@ const OtpScreen = () => {
   const { phone, flowType, loginData } = route.params;
   const { setLoader, setToastMsg } = useContext(Context);
   const dispatch = useDispatch();
+  const enterStyle = useTopEnterAnim({ offsetY: -40 });
 
   // Resend OTP function
   const handleResendOtp = async () => {
@@ -90,6 +94,11 @@ const OtpScreen = () => {
 
       if (flowType === 'login') {
         // Existing user - login and go to home
+        try {
+          if (msg91VerifyResponse?.refreshToken) {
+            await AsyncStorage.setItem('refreshToken', msg91VerifyResponse.refreshToken);
+          }
+        } catch {}
         dispatch(loginAction({ ...msg91VerifyResponse }));
         navigation.reset({
           index: 0,
@@ -111,10 +120,12 @@ const OtpScreen = () => {
   };
 
   return (
-    <OtpComponent
-      onPress={confirmCode}
-      onResend={handleResendOtp}
-    />
+    <Animated.View style={[{ flex: 1 }, enterStyle]}>
+      <OtpComponent
+        onPress={confirmCode}
+        onResend={handleResendOtp}
+      />
+    </Animated.View>
   );
 };
 

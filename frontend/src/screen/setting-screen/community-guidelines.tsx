@@ -8,6 +8,7 @@ import {
   Platform,
   SafeAreaView,
   Linking,
+  Animated,
 } from 'react-native';
 import {
   ArrowLeft,
@@ -21,6 +22,7 @@ import {
 } from 'lucide-react-native';
 import Context from '../../context';
 import useNavigationHook from '../../hooks/use_navigation';
+import useTopEnterAnim from '../../hooks/useTopEnterAnim';
 
 const GUIDELINES = [
   {
@@ -88,21 +90,23 @@ const CommunityGuidelinesScreen = () => {
   const cardBorder = isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.06)';
   const textPrimary = isDark ? '#FFFFFF' : '#111111';
   const textSecondary = isDark ? '#C5C6E3' : '#6B6B8A';
+  const enterStyle = useTopEnterAnim({ offsetY: -40 });
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: bg }}>
-      {/* Header */}
-      <View style={s.header}>
-        <Pressable onPress={() => navigation.goBack()} style={s.backBtn}>
-          <ArrowLeft size={24} color={isDark ? '#8B8CAD' : '#6B6B8A'} />
-        </Pressable>
-      </View>
+      <Animated.View style={[{ flex: 1 }, enterStyle]}>
+        {/* Header */}
+        <View style={s.header}>
+          <Pressable onPress={() => navigation.goBack()} style={s.backBtn}>
+            <ArrowLeft size={24} color={isDark ? '#8B8CAD' : '#6B6B8A'} />
+          </Pressable>
+        </View>
 
-      <ScrollView
-        style={{ flex: 1 }}
-        contentContainerStyle={s.scrollContent}
-        showsVerticalScrollIndicator={false}
-      >
+        <ScrollView
+          style={{ flex: 1 }}
+          contentContainerStyle={s.scrollContent}
+          showsVerticalScrollIndicator={false}
+        >
         {/* Hero */}
         <View style={s.heroWrap}>
           <View
@@ -209,7 +213,8 @@ const CommunityGuidelinesScreen = () => {
             View Full Community Guidelines
           </Text>
         </Pressable>
-      </ScrollView>
+        </ScrollView>
+      </Animated.View>
     </SafeAreaView>
   );
 };

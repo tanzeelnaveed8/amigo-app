@@ -14,12 +14,14 @@ import {
 import { FontFamily } from '../../../../../GlobalStyles';
 import BackArrow from '../../../../assets/svg/backArrow';
 import useNavigationHook from '../../../../hooks/use_navigation';
+import useTopEnterAnim from '../../../../hooks/useTopEnterAnim';
 
 const AccessRequiredScreen = () => {
   const navigation = useNavigationHook();
   const route = useRoute<any>();
   const {phone, otpToken} = route.params || {};
   const floatAnim = useRef(new Animated.Value(0)).current;
+  const enterStyle = useTopEnterAnim({ offsetY: -40 });
 
   const rotate = floatAnim.interpolate({
     inputRange: [0, 1],
@@ -55,7 +57,8 @@ const AccessRequiredScreen = () => {
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      <ScrollView style={styles.container}>
+      <Animated.View style={[{ flex: 1 }, enterStyle]}>
+        <ScrollView style={styles.container}>
         {/* Back Arrow */}
         <TouchableOpacity
           style={styles.backButton}
@@ -122,7 +125,8 @@ const AccessRequiredScreen = () => {
             </Text>
           </TouchableOpacity>
         </View>
-      </ScrollView>
+        </ScrollView>
+      </Animated.View>
     </SafeAreaView>
   );
 };

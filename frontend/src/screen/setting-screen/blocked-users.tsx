@@ -7,6 +7,7 @@ import {
   Pressable,
   Platform,
   SafeAreaView,
+  Animated,
 } from 'react-native';
 import { ArrowLeft, Shield } from 'lucide-react-native';
 import { Image as FastImage } from 'expo-image';
@@ -14,6 +15,7 @@ import Context from '../../context';
 import useNavigationHook from '../../hooks/use_navigation';
 import socketServics from '../../utils/socket';
 import { useSelector } from 'react-redux';
+import useTopEnterAnim from '../../hooks/useTopEnterAnim';
 
 const AVATAR_COLORS = ['#7C3AED', '#2563EB', '#4F46E5', '#DB2777', '#0D9488', '#0891B2'];
 
@@ -68,6 +70,7 @@ const BlockedUsersScreen = () => {
   const cardBorder = isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.06)';
   const textPrimary = isDark ? '#FFFFFF' : '#111111';
   const textSecondary = isDark ? '#8B8CAD' : '#6B6B8A';
+  const enterStyle = useTopEnterAnim({ offsetY: -40 });
 
   const renderItem = ({ item }: { item: any }) => {
     const name = item.name || [item.firstName, item.lastName].filter(Boolean).join(' ') || 'User';
@@ -133,31 +136,33 @@ const BlockedUsersScreen = () => {
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: bg }}>
-      {/* Header */}
-      <View style={s.header}>
-        <Pressable onPress={() => navigation.goBack()} style={s.backBtn}>
-          <ArrowLeft size={24} color={textSecondary} />
-        </Pressable>
-        <Text style={[s.headerTitle, { color: textPrimary }]}>Blocked Users</Text>
-      </View>
+      <Animated.View style={[{ flex: 1 }, enterStyle]}>
+        {/* Header */}
+        <View style={s.header}>
+          <Pressable onPress={() => navigation.goBack()} style={s.backBtn}>
+            <ArrowLeft size={24} color={textSecondary} />
+          </Pressable>
+          <Text style={[s.headerTitle, { color: textPrimary }]}>Blocked Users</Text>
+        </View>
 
-      {/* Description */}
-      <View style={s.descWrap}>
-        <Text style={[s.descText, { color: textSecondary }]}>
-          Blocked users cannot send you messages or see your profile updates.
-          They will not be notified when you block them.
-        </Text>
-      </View>
+        {/* Description */}
+        <View style={s.descWrap}>
+          <Text style={[s.descText, { color: textSecondary }]}>
+            Blocked users cannot send you messages or see your profile updates.
+            They will not be notified when you block them.
+          </Text>
+        </View>
 
-      {/* List */}
-      <FlatList
-        data={blockedUsers}
-        keyExtractor={(item, i) => `${item._id ?? item.id ?? i}`}
-        renderItem={renderItem}
-        ListEmptyComponent={EmptyState}
-        contentContainerStyle={s.listContent}
-        showsVerticalScrollIndicator={false}
-      />
+        {/* List */}
+        <FlatList
+          data={blockedUsers}
+          keyExtractor={(item, i) => `${item._id ?? item.id ?? i}`}
+          renderItem={renderItem}
+          ListEmptyComponent={EmptyState}
+          contentContainerStyle={s.listContent}
+          showsVerticalScrollIndicator={false}
+        />
+      </Animated.View>
     </SafeAreaView>
   );
 };

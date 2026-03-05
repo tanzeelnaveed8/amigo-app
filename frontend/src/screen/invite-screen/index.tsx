@@ -7,6 +7,7 @@ import {
   ActivityIndicator,
   ScrollView,
   Platform,
+  Animated,
 } from 'react-native';
 import React, { useContext, useEffect, useState } from 'react';
 import * as Clipboard from 'expo-clipboard';
@@ -14,6 +15,8 @@ import { ArrowLeft, UserPlus, Copy, Check, Ticket, Sparkles } from 'lucide-react
 import Context from '../../context';
 import useNavigationHook from '../../hooks/use_navigation';
 import { GetInviteCode } from '../../apis/auth';
+import useTopEnterAnim from '../../hooks/useTopEnterAnim';
+import { LinearGradient } from 'expo-linear-gradient';
 
 const MAX_INVITES = 3;
 
@@ -33,6 +36,7 @@ const InviteScreen = () => {
   const [invitesRemaining, setInvitesRemaining] = useState(0);
   const [invitesUsed, setInvitesUsed] = useState(0);
   const [copied, setCopied] = useState(false);
+  const enterStyle = useTopEnterAnim({ offsetY: -40 });
 
   const fetchInvite = async () => {
     setLoading(true);
@@ -83,7 +87,7 @@ const InviteScreen = () => {
   const contentPadding = 32;
 
   const styles = StyleSheet.create({
-    safe: { flex: 1, backgroundColor: isDark ? '#0A0A14' : '#F5F5F7' },
+    safe: { flex: 1 },
     scrollContent: { flexGrow: 1, paddingHorizontal: 20, paddingTop: Platform.OS === 'android' ? 12 : 0, paddingBottom: 40 },
     // Back button row (we use screen so back instead of X)
     header: {
@@ -303,31 +307,34 @@ const InviteScreen = () => {
   if (loading) {
     return (
       <SafeAreaView style={styles.safe}>
-        <View style={styles.header}>
-          <Pressable onPress={() => navigation.goBack()} style={styles.headerBtn}>
-            <ArrowLeft size={24} color={isDark ? 'rgba(255,255,255,0.6)' : '#6B7280'} />
-          </Pressable>
-        </View>
-        <View style={styles.centerWrap}>
-          <ActivityIndicator size="large" color={themeColor} />
-          <Text style={[styles.subtitle, { marginTop: 16 }]}>Loading invite...</Text>
-        </View>
+        <Animated.View style={[{ flex: 1 }, enterStyle]}>
+          <View style={styles.header}>
+            <Pressable onPress={() => navigation.goBack()} style={styles.headerBtn}>
+              <ArrowLeft size={24} color={isDark ? 'rgba(255,255,255,0.6)' : '#6B7280'} />
+            </Pressable>
+          </View>
+          <View style={styles.centerWrap}>
+            <ActivityIndicator size="large" color={themeColor} />
+            <Text style={[styles.subtitle, { marginTop: 16 }]}>Loading invite...</Text>
+          </View>
+        </Animated.View>
       </SafeAreaView>
     );
   }
 
   return (
     <SafeAreaView style={styles.safe}>
-      <ScrollView
-        style={{ flex: 1 }}
-        contentContainerStyle={styles.scrollContent}
-        showsVerticalScrollIndicator={false}
-      >
-        <View style={styles.header}>
-          <Pressable onPress={() => navigation.goBack()} style={styles.headerBtn}>
-            <ArrowLeft size={24} color={isDark ? 'rgba(255,255,255,0.6)' : '#6B7280'} />
-          </Pressable>
-        </View>
+      <Animated.View style={[{ flex: 1 }, enterStyle]}>
+        <ScrollView
+          style={{ flex: 1 }}
+          contentContainerStyle={styles.scrollContent}
+          showsVerticalScrollIndicator={false}
+        >
+          <View style={styles.header}>
+            <Pressable onPress={() => navigation.goBack()} style={styles.headerBtn}>
+              <ArrowLeft size={24} color={isDark ? 'rgba(255,255,255,0.6)' : '#6B7280'} />
+            </Pressable>
+          </View>
 
         {/* Modal card - uisample same layout */}
         <View style={styles.modalCard}>
@@ -418,7 +425,8 @@ const InviteScreen = () => {
             </Pressable>
           </View>
         </View>
-      </ScrollView>
+        </ScrollView>
+      </Animated.View>
     </SafeAreaView>
   );
 };

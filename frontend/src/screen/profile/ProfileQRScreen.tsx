@@ -19,6 +19,7 @@ import { getQrPayload } from '../../apis/qr'
 import useNavigationHook from '../../hooks/use_navigation'
 import fontSize from '../../constants/font-size'
 import fontWeight from '../../constants/font-weight'
+import useTopEnterAnim from '../../hooks/useTopEnterAnim'
 
 const ProfileQRScreen = () => {
     const navigation = useNavigationHook()
@@ -37,6 +38,7 @@ const ProfileQRScreen = () => {
     // Pulsing glow animation for center icon
     const glowAnim = useRef(new Animated.Value(0.35)).current
     const scaleAnim = useRef(new Animated.Value(1)).current
+    const enterStyle = useTopEnterAnim({ offsetY: -40 })
 
     useEffect(() => {
         const loop = Animated.loop(
@@ -124,6 +126,7 @@ const ProfileQRScreen = () => {
 
     return (
         <SafeAreaView style={[styles.safe, { backgroundColor: colors.primary }]}>
+            <Animated.View style={[{ flex: 1 }, enterStyle]}>
 
             {/* ── Header ── */}
             <View style={[styles.header, { marginTop: Platform.OS === 'android' ? 10 : 0 }]}>
@@ -283,6 +286,7 @@ const ProfileQRScreen = () => {
                     </>
                 ) : null}
             </ScrollView>
+            </Animated.View>
         </SafeAreaView>
     )
 }

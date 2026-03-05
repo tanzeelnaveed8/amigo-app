@@ -1,7 +1,7 @@
 /* eslint-disable no-trailing-spaces */
 /* eslint-disable prettier/prettier */
 import React, { useEffect, useState } from "react";
-import { Text, StyleSheet, Image, View, Dimensions, TouchableOpacity, TextInput, SafeAreaView, ScrollView, PermissionsAndroid } from "react-native";
+import { Text, StyleSheet, Image, View, Dimensions, TouchableOpacity, TextInput, SafeAreaView, ScrollView, PermissionsAndroid, Platform, Alert, Linking } from "react-native";
 // import LinearGradient from "react-native-linear-gradient";
 import { Color, FontFamily, FontSize, Border, Padding } from "../../../GlobalStyles";
 import { useDispatch, useSelector } from "react-redux";
@@ -26,18 +26,67 @@ const NewMessage = ({ navigation }) => {
     const [contacts, setContacts] = useState([]);
     // console.log({ user });
     const searchContactAmigo = async () => {
-        await axios.get(`${basepath}user/search-user-in-contact?searchTerm=${searchText}`, {
-            headers: {
-                Authorization: `Bearer ${user.token}`,
-                'Content-Type': 'application/json',
-            }
-        }).then((res) => {
-            console.log({ search: res.data.data.contactNum });
+        const query = searchText?.trim();
+        if (!query) {
+            setSearchUser([]);
+            return;
+        }
+        try {
+            const inContactRes = await axios.get(`${basepath}user/search-user-in-contact?searchTerm=${query}`, {
+                headers: {
+                    Authorization: `Bearer ${user.token}`,
+                    'Content-Type': 'application/json',
+                }
+            });
 
-            setSearchUser(res.data.data.contactNum)
-        }).catch((err) => {
+            const inContactUsers = inContactRes?.data?.data?.contactNum || [];
+            if (inContactUsers.length > 0) {
+                setSearchUser(inContactUsers);
+                return;
+            }
+
+            const dbRes = await axios.get(`${basepath}user/search-user?searchquery=${query}`, {
+                headers: {
+                    Authorization: `Bearer ${user.token}`,
+                    'Content-Type': 'application/json',
+                }
+            });
+
+            const dbByGenericSearch = dbRes?.data?.data || [];
+            const dbByUserNameRes = await axios.post(
+                `${basepath}user/search-user-name`,
+                { userName: query },
+                {
+                    headers: {
+                        Authorization: `Bearer ${user.token}`,
+                        'Content-Type': 'application/json',
+                    }
+                }
+            );
+            const dbByUserName = dbByUserNameRes?.data?.data || [];
+
+            const mergedMap = new Map();
+            [...dbByGenericSearch, ...dbByUserName].forEach((u) => {
+                if (u?._id) mergedMap.set(String(u._id), u);
+            });
+
+            const dbUsers = Array.from(mergedMap.values()).map((u) => ({
+                ...u,
+                firstName: u?.firstName || u?.userName || 'Amigo User',
+                lastName: u?.lastName || '',
+                __notInContact: true,
+            }));
+
+            setSearchUser(dbUsers);
+            if (dbUsers.length > 0) {
+                Alert.alert(
+                    'Contact not in your contacts',
+                    'This user is on Amigo but not saved in your contacts.'
+                );
+            }
+        } catch (err) {
             console.log({ err });
-        })
+        }
     }
 
     const handleNavigateOnChat = (item) => {
@@ -295,7 +344,16 @@ const NewMessage = ({ navigation }) => {
                                             <View style={{ borderWidth: 1, borderColor: "#000", borderRadius: 30, marginRight: 10 }}>
                                                 <Image source={{ uri: item.userProfile }} style={{ height: 50, width: 50,borderColor:"#9B7BFF",borderWidth:1,borderRadius:30 }} />
                                             </View>
-                                            <Text style={[user.isDarkMode ? {color:'#fff'}:{color:"#000"}, { fontSize: 18, fontWeight: "600",  }]} >{item.firstName + " " + item.lastName}</Text>
+                                            <View style={{ flex: 1 }}>
+                                                <Text style={[user.isDarkMode ? {color:'#fff'}:{color:"#000"}, { fontSize: 18, fontWeight: "600" }]} >
+                                                    {(item.firstName || item.userName || 'Amigo User') + (item.lastName ? ` ${item.lastName}` : '')}
+                                                </Text>
+                                                {!!item.__notInContact && (
+                                                    <Text style={{ color: '#FF9E9E', fontSize: 12, marginTop: 2 }}>
+                                                        This contact is not in your contacts
+                                                    </Text>
+                                                )}
+                                            </View>
                                         </TouchableOpacity>
                                     )
                                 })

@@ -26,6 +26,7 @@ import {
 import Context from '../../context';
 import useNavigationHook from '../../hooks/use_navigation';
 import { useSelector } from 'react-redux';
+import useTopEnterAnim from '../../hooks/useTopEnterAnim';
 
 const formatStorage = (mb: number) => {
   if (mb >= 1024) return `${(mb / 1024).toFixed(1)} GB`;
@@ -59,6 +60,7 @@ const SecurityDataScreen = () => {
   const [storageUsed, setStorageUsed] = useState(0);
   const targetStorage = 2458;
   const storagePercentage = (storageUsed / totalStorage) * 100;
+  const enterStyle = useTopEnterAnim({ offsetY: -40 });
 
   useEffect(() => {
     const steps = 40;
@@ -301,6 +303,7 @@ const SecurityDataScreen = () => {
 
   return (
     <SafeAreaView style={s.safe}>
+      <Animated.View style={[{ flex: 1 }, enterStyle]}>
       {/* Header */}
       <View style={s.header}>
         <Pressable onPress={() => navigation.goBack()} style={s.backBtn}>
@@ -595,6 +598,7 @@ const SecurityDataScreen = () => {
           </Pressable>
         </Pressable>
       </Modal>
+      </Animated.View>
     </SafeAreaView>
   );
 };

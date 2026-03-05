@@ -12,6 +12,7 @@ import {
 import * as Clipboard from 'expo-clipboard';
 import { X, UserPlus, Copy, Check, Sparkles, Ticket } from 'lucide-react-native';
 import { GetInviteCode } from '../apis/auth';
+import { LinearGradient } from 'expo-linear-gradient';
 
 const MAX_INVITES = 3;
 
@@ -96,12 +97,12 @@ export const InviteCodeModal = ({
       paddingHorizontal: 32,
       ...(isDarkMode
         ? {
-            backgroundColor: '#141422',
+            backgroundColor: 'transparent',
             borderWidth: 1,
             borderColor: 'rgba(255,255,255,0.1)',
           }
         : {
-            backgroundColor: '#FFFFFF',
+            backgroundColor: 'transparent',
             borderWidth: 1,
             borderColor: 'rgba(0,0,0,0.06)',
           }),
@@ -110,6 +111,10 @@ export const InviteCodeModal = ({
       shadowOpacity: isDarkMode ? 0.5 : 0.15,
       shadowRadius: 24,
       elevation: 12,
+    },
+    cardGradient: {
+      ...StyleSheet.absoluteFillObject,
+      borderRadius: 32,
     },
     decorativeBlur: {
       position: 'absolute' as const,
@@ -278,6 +283,17 @@ export const InviteCodeModal = ({
     >
       <Pressable style={styles.overlay} onPress={onClose}>
         <Pressable style={styles.card} onPress={(e) => e.stopPropagation()}>
+          <LinearGradient
+            pointerEvents="none"
+            colors={
+              isDarkMode
+                ? ['#0A0A14', `${themeColor}40`]
+                : ['#FFFFFF', `${themeColor}20`]
+            }
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 1 }}
+            style={styles.cardGradient}
+          />
           <View style={styles.decorativeBlur} />
 
           <View style={styles.headerRow}>

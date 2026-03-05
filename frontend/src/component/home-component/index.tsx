@@ -5,6 +5,8 @@ import {
   Pressable,
   StyleSheet,
   Text,
+  Animated,
+  Easing,
 } from 'react-native';
 import React, { useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import useNavigationHook from '../../hooks/use_navigation';
@@ -23,6 +25,7 @@ import { _isEmpty, searchData } from '../../utils/helper';
 import Context from '../../context';
 import { Plus } from 'lucide-react-native';
 import socketServics from '../../utils/socket';
+import { LinearGradient } from 'expo-linear-gradient';
 
 type TabType = 'dm' | 'group' | 'chanel';
 
@@ -38,7 +41,54 @@ const HomeScreenComponent = (props: HomeProps) => {
   const colors = ctx?.colors ?? {};
   const contactList = ctx?.contactList ?? [];
   const accent = colors.accentColor ?? '#9B7BFF';
+  const accentLight = colors.accentLight ?? '#7C5FD4';
   const isDark = colors.bgColor === '#0A0A14' || (colors.bgColor && String(colors.bgColor).includes('0A0A'));
+  const topEnterAnim = useRef(new Animated.Value(0)).current;
+  const bodyEnterAnim = useRef(new Animated.Value(0)).current;
+  const plusTapAnim = useRef(new Animated.Value(0)).current;
+  const plusFloatAnim = useRef(new Animated.Value(0)).current;
+
+  useEffect(() => {
+    topEnterAnim.setValue(0);
+    bodyEnterAnim.setValue(0);
+    Animated.sequence([
+      Animated.timing(topEnterAnim, {
+        toValue: 1,
+        duration: 320,
+        easing: Easing.out(Easing.cubic),
+        useNativeDriver: true,
+      }),
+      Animated.timing(bodyEnterAnim, {
+        toValue: 1,
+        duration: 360,
+        easing: Easing.out(Easing.cubic),
+        useNativeDriver: true,
+      }),
+    ]).start();
+  }, [topEnterAnim, bodyEnterAnim]);
+
+  useEffect(() => {
+    const loop = Animated.loop(
+      Animated.sequence([
+        Animated.timing(plusFloatAnim, {
+          toValue: 1,
+          duration: 1400,
+          easing: Easing.inOut(Easing.sin),
+          useNativeDriver: true,
+        }),
+        Animated.timing(plusFloatAnim, {
+          toValue: 0,
+          duration: 1400,
+          easing: Easing.inOut(Easing.sin),
+          useNativeDriver: true,
+        }),
+      ]),
+    );
+    loop.start();
+    return () => {
+      loop.stop();
+    };
+  }, [plusFloatAnim]);
 
   const dataSorting = useCallback(
     (index: number) => {
@@ -223,24 +273,62 @@ const HomeScreenComponent = (props: HomeProps) => {
     </View>
   );
 
+  const animatePlusTap = (toValue: number) => {
+    Animated.timing(plusTapAnim, {
+      toValue,
+      duration: 120,
+      easing: Easing.out(Easing.quad),
+      useNativeDriver: true,
+    }).start();
+  };
+
   return (
     <BackgroundContainer
       Whitebgwidth="100%"
       Whitebgheight={getHeightInPercentage(71)}
       paddingVertical={0}
       mainchildren={
-        <MainChildrenView
-          username={userData?.data?.firstName}
-          totalmessages={Data?.[0]?.data?.reduce((t: number, g: any) => t + (g?.unseenMsg ?? 0), 0)}
-          dmCount={Data?.[0]?.data?.filter((r: any) => r?.type === 'dm')?.length ?? 0}
-          groupCount={Data?.[0]?.data?.filter((r: any) => r?.type === 'group')?.length ?? 0}
-          channelCount={Data?.[0]?.data?.filter((r: any) => r?.type === 'chanel')?.length ?? 0}
-          searchValue={searchQuery}
-          onSearchChange={handleSearch}
-        />
+        <Animated.View
+          style={{
+            opacity: topEnterAnim,
+            transform: [
+              {
+                translateY: topEnterAnim.interpolate({
+                  inputRange: [0, 1],
+                  outputRange: [-28, 0],
+                }),
+              },
+            ],
+          }}
+        >
+          <MainChildrenView
+            username={userData?.data?.firstName}
+            totalmessages={Data?.[0]?.data?.reduce((t: number, g: any) => t + (g?.unseenMsg ?? 0), 0)}
+            dmCount={Data?.[0]?.data?.filter((r: any) => r?.type === 'dm')?.length ?? 0}
+            groupCount={Data?.[0]?.data?.filter((r: any) => r?.type === 'group')?.length ?? 0}
+            channelCount={Data?.[0]?.data?.filter((r: any) => r?.type === 'chanel')?.length ?? 0}
+            searchValue={searchQuery}
+            onSearchChange={handleSearch}
+          />
+        </Animated.View>
       }
       children={
-        <View style={styles.secondcontainer}>
+        <Animated.View
+          style={[
+            styles.secondcontainer,
+            {
+              opacity: bodyEnterAnim,
+              transform: [
+                {
+                  translateY: bodyEnterAnim.interpolate({
+                    inputRange: [0, 1],
+                    outputRange: [-22, 0],
+                  }),
+                },
+              ],
+            },
+          ]}
+        >
           <View style={styles.tabsRow}>
             <TabsRow />
           </View>
@@ -271,29 +359,77 @@ const HomeScreenComponent = (props: HomeProps) => {
             </>
           )}
 
-          <Pressable
-            onPress={() => navigation.navigate('CreateNewScreen')}
-            style={({ pressed }) => [
+          <Animated.View
+            style={[
               styles.addicon,
               {
-                backgroundColor: accent,
-                width: 58,
-                height: 58,
-                borderRadius: 29,
-                justifyContent: 'center',
-                alignItems: 'center',
-                shadowColor: accent,
-                shadowOffset: { width: 0, height: 4 },
-                shadowOpacity: 0.35,
-                shadowRadius: 12,
-                elevation: 8,
-                opacity: pressed ? 0.9 : 1,
+                transform: [
+                  {
+                    translateY: plusFloatAnim.interpolate({
+                      inputRange: [0, 1],
+                      outputRange: [0, -10],
+                    }),
+                  },
+                  {
+                    scale: plusTapAnim.interpolate({
+                      inputRange: [0, 1],
+                      outputRange: [1, 0.9],
+                    }),
+                  },
+                ],
               },
             ]}
           >
-            <Plus size={26} color="#FFFFFF" strokeWidth={2.5} />
-          </Pressable>
-        </View>
+            <Pressable
+              onPressIn={() => animatePlusTap(1)}
+              onPressOut={() => animatePlusTap(0)}
+              onPress={() => navigation.navigate('CreateNewScreen')}
+              style={({ pressed }) => [
+                {
+                  width: 58,
+                  height: 58,
+                  borderRadius: 29,
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  shadowColor: accent,
+                  shadowOffset: { width: 0, height: 4 },
+                  shadowOpacity: 0.35,
+                  shadowRadius: 12,
+                  elevation: 8,
+                  opacity: pressed ? 0.9 : 1,
+                  overflow: 'hidden',
+                },
+              ]}
+            >
+              <LinearGradient
+                colors={[accent, accentLight]}
+                start={{ x: 0.1, y: 0.1 }}
+                end={{ x: 0.9, y: 0.9 }}
+                style={{
+                  position: 'absolute',
+                  top: 0,
+                  left: 0,
+                  right: 0,
+                  bottom: 0,
+                }}
+              />
+              <Animated.View
+                style={{
+                  transform: [
+                    {
+                      rotate: plusTapAnim.interpolate({
+                        inputRange: [0, 1],
+                        outputRange: ['0deg', '18deg'],
+                      }),
+                    },
+                  ],
+                }}
+              >
+                <Plus size={26} color="#FFFFFF" strokeWidth={2.5} />
+              </Animated.View>
+            </Pressable>
+          </Animated.View>
+        </Animated.View>
       }
     />
   );

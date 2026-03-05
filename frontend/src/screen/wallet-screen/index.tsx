@@ -1,6 +1,7 @@
 import React, { useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import {
   ActivityIndicator,
+  Animated,
   Modal,
   Pressable,
   SafeAreaView,
@@ -38,6 +39,7 @@ import {
 } from '../../apis/wallet';
 import { launchImageLibrary } from '../../utils/imagePickerCompat';
 import * as DocumentPicker from 'expo-document-picker';
+import useTopEnterAnim from '../../hooks/useTopEnterAnim';
 
 const MAX_ITEMS = 30;
 const MAX_STORAGE_MB = 300;
@@ -48,6 +50,7 @@ const WalletScreen = () => {
   const { colors, setToastMsg } = useContext(Context);
   const isDark = colors.bgColor === '#0A0A14' || (colors.bgColor && String(colors.bgColor).includes('0A0A'));
   const accent = colors.accentColor ?? '#9B7BFF';
+  const enterStyle = useTopEnterAnim({ offsetY: -40 });
 
   const [items, setItems] = useState<WalletItem[]>([]);
   const [totalSizeBytes, setTotalSizeBytes] = useState(0);
@@ -437,18 +440,19 @@ const WalletScreen = () => {
 
   return (
     <SafeAreaView style={styles.safe}>
-      <View style={styles.header}>
-        <Pressable style={styles.backBtn} onPress={() => navigation.goBack()}>
-          <ArrowLeft size={22} color={accent} />
-        </Pressable>
-      </View>
+      <Animated.View style={[{ flex: 1 }, enterStyle]}>
+        <View style={styles.header}>
+          <Pressable style={styles.backBtn} onPress={() => navigation.goBack()}>
+            <ArrowLeft size={22} color={accent} />
+          </Pressable>
+        </View>
 
-      <ScrollView style={styles.scroll} showsVerticalScrollIndicator={false}>
-        <Text style={styles.titleMy}>My</Text>
-        <Text style={[styles.titleWallet, { color: accent }]}>Wallet</Text>
-        <Text style={styles.subtitle}>
-          Securely store, organize, and access your important documents and IDs.
-        </Text>
+        <ScrollView style={styles.scroll} showsVerticalScrollIndicator={false}>
+          <Text style={styles.titleMy}>My</Text>
+          <Text style={[styles.titleWallet, { color: accent }]}>Wallet</Text>
+          <Text style={styles.subtitle}>
+            Securely store, organize, and access your important documents and IDs.
+          </Text>
 
         <View style={styles.card}>
           <View style={styles.cardRow}>
@@ -561,24 +565,25 @@ const WalletScreen = () => {
             ))
           )}
         </View>
-      </ScrollView>
+        </ScrollView>
 
-      <View style={styles.fabWrap}>
-        <Pressable
-          onPress={handleAdd}
-          disabled={uploading || items.length >= MAX_ITEMS}
-          style={[styles.fab, { backgroundColor: accent }]}
-        >
-          {uploading ? (
-            <ActivityIndicator color="#FFF" size="small" />
-          ) : (
-            <>
-              <Plus size={20} color="#FFFFFF" strokeWidth={2.5} />
-              <Text style={styles.fabText}>Add New Item</Text>
-            </>
-          )}
-        </Pressable>
-      </View>
+        <View style={styles.fabWrap}>
+          <Pressable
+            onPress={handleAdd}
+            disabled={uploading || items.length >= MAX_ITEMS}
+            style={[styles.fab, { backgroundColor: accent }]}
+          >
+            {uploading ? (
+              <ActivityIndicator color="#FFF" size="small" />
+            ) : (
+              <>
+                <Plus size={20} color="#FFFFFF" strokeWidth={2.5} />
+                <Text style={styles.fabText}>Add New Item</Text>
+              </>
+            )}
+          </Pressable>
+        </View>
+      </Animated.View>
 
       <Modal
         visible={!!selectedItem}

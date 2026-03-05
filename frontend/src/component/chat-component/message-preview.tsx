@@ -25,6 +25,7 @@ interface props {
 const MessagePreview = (props: props) => {
     const { image, isReplay, message, onPressCancel, audio, isUploading } = props
     const { colors } = useContext(Context)
+    const accent = colors?.accentColor ?? '#9B7BFF'
     const [extension, setExtension] = useState<any>('')
     const progressAnim = useRef(new Animated.Value(0)).current;
 
@@ -62,27 +63,38 @@ const MessagePreview = (props: props) => {
     });
 
     return (
-        <View style={[styles.chatimageview, { backgroundColor: colors.inputBGColor, borderColor: '#9B7BFF' }]}>
+        <View style={[styles.chatimageview, { backgroundColor: colors.inputBGColor, borderColor: accent }]}>
             {isUploading && (
                 <View style={styles.progressTrack}>
-                    <Animated.View style={[styles.progressBar, { width: progressWidth }]} />
+                    <Animated.View
+                        style={[
+                            styles.progressBar,
+                            { width: progressWidth, backgroundColor: accent },
+                        ]}
+                    />
                 </View>
             )}
             <View style={{ flexDirection: 'row', alignItems: 'center', flex: 1, marginRight: 10 }}>
                 <View style={{ borderRadius: 12, overflow: 'hidden' }}>
                     {isUploading ? (
                         <View style={styles.uploadThumb}>
-                            <ActivityIndicator size="small" color="#9B7BFF" />
+                            <ActivityIndicator size="small" color={accent} />
                         </View>
                     ) : audio == 'image' ? <FastImage source={{ uri: image }} style={{ height: 46, width: 46, borderRadius: 12 }} /> :
-                        audio == 'video' ? <View style={styles.mediaThumb}><ShareVideoIcon color="#9B7BFF" /></View> :
-                            audio == 'audio' ? <View style={styles.mediaThumb}><ShareSongIcon color="#9B7BFF" /></View> :
-                                audio == 'doc' ? <View style={styles.mediaThumb}><ShareDocIcon color="#9B7BFF" /></View> : null
+                        audio == 'video' ? <View style={styles.mediaThumb}><ShareVideoIcon color={accent} /></View> :
+                            audio == 'audio' ? <View style={styles.mediaThumb}><ShareSongIcon color={accent} /></View> :
+                                audio == 'doc' ? <View style={styles.mediaThumb}><ShareDocIcon color={accent} /></View> : null
                     }
                 </View>
                 <View style={{ flex: 1, paddingHorizontal: 12, maxWidth: SCREEN_WIDTH - 150 }}>
                     {isUploading ? (
-                        <RNText numberOfLines={1} label="Sending..." fontWeight={fontWeight._600} fontSize={fontSize._14} color="#9B7BFF" />
+                        <RNText
+                            numberOfLines={1}
+                            label="Sending..."
+                            fontWeight={fontWeight._600}
+                            fontSize={fontSize._14}
+                            color={accent}
+                        />
                     ) : (
                         <RNText
                             numberOfLines={2}

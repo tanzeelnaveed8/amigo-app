@@ -7,6 +7,7 @@ import {
   SafeAreaView,
   ScrollView,
   Platform,
+  Animated,
 } from 'react-native';
 import { ArrowLeft, Users, Radio, AlertCircle } from 'lucide-react-native';
 import { useFocusEffect } from '@react-navigation/native';
@@ -16,6 +17,7 @@ import useNavigationHook from '../../hooks/use_navigation';
 import Context from '../../context';
 import { getRoomsCreatedToday, getRoomsLeftToday } from '../../utils/roomsCreatedToday';
 import { getChanel } from '../../apis/channel';
+import useTopEnterAnim from '../../hooks/useTopEnterAnim';
 
 const CreateNewScreen = () => {
   const navigation = useNavigationHook();
@@ -24,6 +26,7 @@ const CreateNewScreen = () => {
   const { colors, setConversationType, setGroupType } = useContext(Context);
   const isDark = colors?.bgColor === '#0A0A14' || (colors?.bgColor && String(colors.bgColor).includes('0A0A'));
   const accent = colors?.accentColor ?? '#9B7BFF';
+  const enterStyle = useTopEnterAnim({ offsetY: -40 });
 
   const [roomsCreatedToday, setRoomsCreatedToday] = useState(0);
 
@@ -123,7 +126,7 @@ const CreateNewScreen = () => {
 
   return (
     <SafeAreaView style={[styles.safe, { backgroundColor: isDark ? '#0A0A14' : '#FAFAFA' }]}>
-      <View style={styles.container}>
+      <Animated.View style={[styles.container, enterStyle]}>
         <View style={styles.header}>
           <Pressable
             onPress={() => navigation.goBack()}
@@ -173,7 +176,7 @@ const CreateNewScreen = () => {
             disabled={hasSignal}
           />
         </ScrollView>
-      </View>
+      </Animated.View>
     </SafeAreaView>
   );
 };

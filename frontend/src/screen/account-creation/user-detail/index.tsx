@@ -22,12 +22,17 @@ const UserDetailScreen = () => {
   // const userData: any = useSelector((state: any) => state.loginData);
   console.log(userData)
   const { mutate } = useMutation(CreateUser, {
-    onSuccess: res => {
+    onSuccess: async res => {
       console.log('CREATE_USER_SUCCESS:', res);
       setLoader(false);
 
       // Check for successful creation (status 201)
       if (res.status === 201) {
+        try {
+          if (res?.refreshToken) {
+            await AsyncStorage.setItem('refreshToken', res.refreshToken);
+          }
+        } catch {}
         dispatch(loginAction({ ...res }));
         navigation.navigate('AccountTypeScreen');
       } else {

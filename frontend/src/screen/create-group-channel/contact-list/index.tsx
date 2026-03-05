@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useMemo, useState } from 'react';
+import React, { useContext, useEffect, useMemo, useRef, useState } from 'react';
 import {
   View,
   Text,
@@ -10,6 +10,8 @@ import {
   SafeAreaView,
   ActivityIndicator,
   Platform,
+  Animated,
+  Easing,
 } from 'react-native';
 import axios from 'axios';
 import { Image as FastImage } from 'expo-image';
@@ -25,6 +27,7 @@ import {
 import { useQuery, useMutation } from 'react-query';
 import { useSelector } from 'react-redux';
 import { PermissionsAndroid } from 'react-native';
+import { useFocusEffect } from '@react-navigation/native';
 import Context from '../../../context';
 import useNavigationHook from '../../../hooks/use_navigation';
 import { ReCheckContactList, getAllContact } from '../../../apis/contacts';
@@ -72,6 +75,8 @@ const ContactListScreen = () => {
   const [selectedContact, setSelectedContact] = useState<ContactItem | null>(null);
   const [fetchError, setFetchError] = useState<string | null>(null);
   const [dbSearchResults, setDbSearchResults] = useState<ContactItem[]>([]);
+  const headerEnterAnim = useRef(new Animated.Value(0)).current;
+  const bodyEnterAnim = useRef(new Animated.Value(0)).current;
 
   const { isFetching, refetch } = useQuery(
     ['get-allcontact', token],
@@ -151,6 +156,30 @@ const ContactListScreen = () => {
   useEffect(() => {
     requestContactsPermission();
   }, []);
+
+  useFocusEffect(
+    React.useCallback(() => {
+      headerEnterAnim.setValue(0);
+      bodyEnterAnim.setValue(0);
+      const timer = setTimeout(() => {
+        Animated.parallel([
+          Animated.timing(headerEnterAnim, {
+            toValue: 1,
+            duration: 520,
+            easing: Easing.out(Easing.cubic),
+            useNativeDriver: true,
+          }),
+          Animated.timing(bodyEnterAnim, {
+            toValue: 1,
+            duration: 560,
+            easing: Easing.out(Easing.cubic),
+            useNativeDriver: true,
+          }),
+        ]).start();
+      }, 120);
+      return () => clearTimeout(timer);
+    }, [headerEnterAnim, bodyEnterAnim]),
+  );
 
   useEffect(() => {
     const q = searchQuery.trim();
@@ -405,36 +434,64 @@ const ContactListScreen = () => {
 
   return (
     <SafeAreaView style={styles.safe}>
-      <View style={styles.header}>
-        <Pressable style={styles.backBtn} onPress={() => navigation.goBack()}>
-          <ArrowLeft size={21} color={isDark ? '#FFFFFF' : '#111827'} />
-        </Pressable>
-        <Text style={styles.titleMain}>Your</Text>
-        <Text style={styles.titleAccent}>Contacts</Text>
-        <View style={styles.subtitleRow}>
-          <Text style={styles.subtitle}>All in one place on Amigo</Text>
-          <View style={styles.badge}>
-            <Users size={10} color={accent} />
-            <Text style={styles.badgeText}>{data.length}</Text>
+      <Animated.View
+        style={{
+          opacity: headerEnterAnim,
+          transform: [
+            {
+              translateY: headerEnterAnim.interpolate({
+                inputRange: [0, 1],
+                outputRange: [-56, 0],
+              }),
+            },
+          ],
+        }}
+      >
+        <View style={styles.header}>
+          <Pressable style={styles.backBtn} onPress={() => navigation.goBack()}>
+            <ArrowLeft size={21} color={isDark ? '#FFFFFF' : '#111827'} />
+          </Pressable>
+          <Text style={styles.titleMain}>Your</Text>
+          <Text style={styles.titleAccent}>Contacts</Text>
+          <View style={styles.subtitleRow}>
+            <Text style={styles.subtitle}>All in one place on Amigo</Text>
+            <View style={styles.badge}>
+              <Users size={10} color={accent} />
+              <Text style={styles.badgeText}>{data.length}</Text>
+            </View>
+          </View>
+          <View style={styles.searchWrap}>
+            <Search size={17} color={isDark ? '#5E607E' : '#9CA3AF'} />
+            <TextInput
+              style={styles.searchInput}
+              placeholder="Search contacts..."
+              placeholderTextColor={isDark ? '#5E607E' : '#9CA3AF'}
+              value={searchQuery}
+              onChangeText={setSearchQuery}
+            />
+            {searchQuery.length > 0 ? (
+              <Pressable style={styles.searchClear} onPress={() => setSearchQuery('')}>
+                <X size={14} color={isDark ? 'rgba(255,255,255,0.7)' : '#6B7280'} />
+              </Pressable>
+            ) : null}
           </View>
         </View>
-        <View style={styles.searchWrap}>
-          <Search size={17} color={isDark ? '#5E607E' : '#9CA3AF'} />
-          <TextInput
-            style={styles.searchInput}
-            placeholder="Search contacts..."
-            placeholderTextColor={isDark ? '#5E607E' : '#9CA3AF'}
-            value={searchQuery}
-            onChangeText={setSearchQuery}
-          />
-          {searchQuery.length > 0 ? (
-            <Pressable style={styles.searchClear} onPress={() => setSearchQuery('')}>
-              <X size={14} color={isDark ? 'rgba(255,255,255,0.7)' : '#6B7280'} />
-            </Pressable>
-          ) : null}
-        </View>
-      </View>
+      </Animated.View>
 
+      <Animated.View
+        style={{
+          flex: 1,
+          opacity: bodyEnterAnim,
+          transform: [
+            {
+              translateY: bodyEnterAnim.interpolate({
+                inputRange: [0, 1],
+                outputRange: [-40, 0],
+              }),
+            },
+          ],
+        }}
+      >
       <ScrollView style={styles.scroll} showsVerticalScrollIndicator={false}>
         {!token ? (
           <View style={styles.emptyWrap}>
@@ -518,6 +575,7 @@ const ContactListScreen = () => {
           ))
         )}
       </ScrollView>
+      </Animated.View>
 
       <Modal visible={!!selectedContact} transparent animationType="slide" onRequestClose={() => setSelectedContact(null)}>
         <Pressable style={styles.modalBackdrop} onPress={() => setSelectedContact(null)}>

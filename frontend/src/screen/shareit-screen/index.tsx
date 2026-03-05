@@ -1,4 +1,4 @@
-import { Dimensions, FlatList, Platform, Pressable, SafeAreaView, TouchableOpacity, View } from 'react-native'
+import { Animated, Dimensions, FlatList, Platform, Pressable, SafeAreaView, TouchableOpacity, View } from 'react-native'
 import React, { useCallback, useContext, useEffect, useState } from 'react'
 import {LinearGradient} from 'expo-linear-gradient'
 import RNText from '../../component/atoms/text'
@@ -23,6 +23,7 @@ import ShareSongIcon from '../../assets/svg/sharesong.icon'
 import ListemptyComponent from '../../component/atoms/listEmptyComponent'
 import ShareFileIcon from '../../assets/svg/sharefile.icon'
 import {Image as FastImage} from 'expo-image'
+import useTopEnterAnim from '../../hooks/useTopEnterAnim'
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window')
 const GRID_GAP = 12
@@ -38,6 +39,7 @@ const ShareItScreen = () => {
     const { setLoader, setShareMsg } = useContext(Context)
     const userData: any = useSelector((state: any) => state.loginData);
     const [mediaItem, setMediaItem] = useState<any>([])
+    const enterStyle = useTopEnterAnim({ offsetY: -40 })
 
 
     const RenderItemForImages = useCallback(({ item, index }: any) => {
@@ -230,73 +232,75 @@ const ShareItScreen = () => {
 
     return (
         <LinearGradient colors={[colors.primary, colors.primary]} style={styles.container}>
-            <SafeAreaView style={{ width: '100%', }}>
-                <View style={{ paddingHorizontal: 20, marginTop: 10 }}>
-                    <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-                        <Pressable onPress={navigation.goBack} hitSlop={20}>
-                            <BackArrow />
-                        </Pressable>
-                        {!route?.isMedia && <TouchableOpacity
-                            style={{ flexDirection: 'row', alignItems: 'center' }}
-                            onPress={() => {
-                                if (mediatype == 'image' || mediatype == 'video') {
-                                    OpenGallery(mediatype == 'image' ? 'photo' : 'video')
-                                } else {
-                                    OpenDocumentPicker()
-                                }
-                            }}>
-                            <ShareImageIcon size={40} />
-                            <RNText paddingHorizontal={8} label={`Browse ${mediatype}`} color={colors.white} fontSize={fontSize._18} fontWeight={fontWeight._500} />
-                        </TouchableOpacity>}
+            <Animated.View style={[{ flex: 1 }, enterStyle]}>
+                <SafeAreaView style={{ width: '100%', }}>
+                    <View style={{ paddingHorizontal: 20, marginTop: 10 }}>
+                        <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+                            <Pressable onPress={navigation.goBack} hitSlop={20}>
+                                <BackArrow />
+                            </Pressable>
+                            {!route?.isMedia && <TouchableOpacity
+                                style={{ flexDirection: 'row', alignItems: 'center' }}
+                                onPress={() => {
+                                    if (mediatype == 'image' || mediatype == 'video') {
+                                        OpenGallery(mediatype == 'image' ? 'photo' : 'video')
+                                    } else {
+                                        OpenDocumentPicker()
+                                    }
+                                }}>
+                                <ShareImageIcon size={40} />
+                                <RNText paddingHorizontal={8} label={`Browse ${mediatype}`} color={colors.white} fontSize={fontSize._18} fontWeight={fontWeight._500} />
+                            </TouchableOpacity>}
+                        </View>
                     </View>
+                </SafeAreaView>
+                {
+                    (mediatype == 'video' || mediatype == 'image') &&
+                    <FlatList
+                        data={mediaItem}
+                        showsVerticalScrollIndicator={false}
+                        keyExtractor={(_, index) => `${index}`}
+                        numColumns={2}
+                        columnWrapperStyle={{ justifyContent: 'space-between', marginTop: 8 }}
+                        contentContainerStyle={{ flexGrow: 1, paddingHorizontal: GRID_SIDE_PADDING, marginTop: 8, paddingBottom: 10 }}
+                        ListEmptyComponent={<ListemptyComponent color={colors.white} isLoading={isLoading} />}
+                        renderItem={RenderItemForImages}
+                    />
+                }
+                {
+                    (mediatype == 'audio' || mediatype == 'file') &&
+                    <FlatList
+                        data={mediaItem}
+                        showsVerticalScrollIndicator={false}
+                        keyExtractor={(_, index) => `${index}`}
+                        contentContainerStyle={{ flexGrow: 1, marginTop: 10, marginHorizontal: 30 }}
+                        ListEmptyComponent={<ListemptyComponent color={colors.white} isLoading={isLoading} />}
+                        renderItem={RenderItemForDoc}
+                    />
+                }
+                <View style={styles.lastview}>
+                    {!route?.isMedia && (
+                    <>
+                    <View style={styles.line} />
+                    <FlatList
+                        data={Data}
+                        showsVerticalScrollIndicator={false}
+                        horizontal
+                        keyExtractor={(_, index) => `${index}`}
+                        scrollEnabled={false}
+                        contentContainerStyle={{ flexGrow: 1, justifyContent: 'space-evenly' }}
+                        renderItem={({ item, index }) => {
+                            return (
+                                <TouchableOpacity onPress={() => onClickItem(index)} style={styles.lastimageview} activeOpacity={0.5}>
+                                    {item.icon}
+                                </TouchableOpacity>
+                            )
+                        }}
+                    />
+                    </>
+                    )}
                 </View>
-            </SafeAreaView>
-            {
-                (mediatype == 'video' || mediatype == 'image') &&
-                <FlatList
-                    data={mediaItem}
-                    showsVerticalScrollIndicator={false}
-                    keyExtractor={(_, index) => `${index}`}
-                    numColumns={2}
-                    columnWrapperStyle={{ justifyContent: 'space-between', marginTop: 8 }}
-                    contentContainerStyle={{ flexGrow: 1, paddingHorizontal: GRID_SIDE_PADDING, marginTop: 8, paddingBottom: 10 }}
-                    ListEmptyComponent={<ListemptyComponent color={colors.white} isLoading={isLoading} />}
-                    renderItem={RenderItemForImages}
-                />
-            }
-            {
-                (mediatype == 'audio' || mediatype == 'file') &&
-                <FlatList
-                    data={mediaItem}
-                    showsVerticalScrollIndicator={false}
-                    keyExtractor={(_, index) => `${index}`}
-                    contentContainerStyle={{ flexGrow: 1, marginTop: 10, marginHorizontal: 30 }}
-                    ListEmptyComponent={<ListemptyComponent color={colors.white} isLoading={isLoading} />}
-                    renderItem={RenderItemForDoc}
-                />
-            }
-            <View style={styles.lastview}>
-                {!route?.isMedia && (
-                <>
-                <View style={styles.line} />
-                <FlatList
-                    data={Data}
-                    showsVerticalScrollIndicator={false}
-                    horizontal
-                    keyExtractor={(_, index) => `${index}`}
-                    scrollEnabled={false}
-                    contentContainerStyle={{ flexGrow: 1, justifyContent: 'space-evenly' }}
-                    renderItem={({ item, index }) => {
-                        return (
-                            <TouchableOpacity onPress={() => onClickItem(index)} style={styles.lastimageview} activeOpacity={0.5}>
-                                {item.icon}
-                            </TouchableOpacity>
-                        )
-                    }}
-                />
-                </>
-                )}
-            </View>
+            </Animated.View>
         </LinearGradient>
     )
 }
