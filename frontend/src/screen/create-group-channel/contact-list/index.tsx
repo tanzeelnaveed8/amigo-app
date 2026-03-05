@@ -11,6 +11,7 @@ import {
   ActivityIndicator,
   Platform,
 } from 'react-native';
+import axios from 'axios';
 import { Image as FastImage } from 'expo-image';
 import {
   ArrowLeft,
@@ -27,6 +28,7 @@ import { PermissionsAndroid } from 'react-native';
 import Context from '../../../context';
 import useNavigationHook from '../../../hooks/use_navigation';
 import { ReCheckContactList, getAllContact } from '../../../apis/contacts';
+import { BASE_URL } from '../../../apis/base_url';
 import Contacts from '../../../utils/contactsCompat';
 import { FAKE_CONTACTS_0320 } from '../../../constants/fakeContacts';
 
@@ -39,6 +41,7 @@ export interface ContactItem {
   conversationId?: string;
   displayName?: string;
   userName?: string;
+  notInContact?: boolean;
 }
 
 const getInitials = (name?: string, desc?: string) => {
@@ -68,6 +71,7 @@ const ContactListScreen = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedContact, setSelectedContact] = useState<ContactItem | null>(null);
   const [fetchError, setFetchError] = useState<string | null>(null);
+  const [dbSearchResults, setDbSearchResults] = useState<ContactItem[]>([]);
 
   const { isFetching, refetch } = useQuery(
     ['get-allcontact', token],
@@ -148,15 +152,73 @@ const ContactListScreen = () => {
     requestContactsPermission();
   }, []);
 
+  useEffect(() => {
+    const q = searchQuery.trim();
+    if (!q || !token) {
+      setDbSearchResults([]);
+      return;
+    }
+
+    const timer = setTimeout(async () => {
+      try {
+        const normalizedQuery = q.startsWith('@') ? q.slice(1) : q;
+        const headers = {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        };
+
+        const [searchUserRes, searchUserNameRes] = await Promise.allSettled([
+          axios.get(`${BASE_URL}/user/search-user?searchquery=${encodeURIComponent(normalizedQuery)}`, { headers }),
+          axios.post(`${BASE_URL}/user/search-user-name`, { userName: normalizedQuery }, { headers }),
+        ]);
+
+        const genericList =
+          searchUserRes.status === 'fulfilled' ? (searchUserRes.value?.data?.data || []) : [];
+        const byUserNameList =
+          searchUserNameRes.status === 'fulfilled' ? (searchUserNameRes.value?.data?.data || []) : [];
+
+        const existingIds = new Set((data || []).map((c) => String(c.id)));
+        const currentUserId = String(userData?.data?._id || userData?._id || '');
+        const mergedMap = new Map<string, any>();
+        [...genericList, ...byUserNameList].forEach((u: any) => {
+          if (u?._id) mergedMap.set(String(u._id), u);
+        });
+
+        const arr = Array.from(mergedMap.values())
+          .filter((u: any) => String(u?._id) !== currentUserId)
+          .filter((u: any) => !existingIds.has(String(u?._id)))
+          .map((u: any) => ({
+            id: String(u._id),
+            name: u.userName || '',
+            desc: u.firstName || '',
+            profileImage: u.userProfile,
+            blockUser: [],
+            conversationId: '',
+            displayName: [u.firstName, u.lastName].filter(Boolean).join(' ') || u.userName || 'Amigo User',
+            userName: u.userName,
+            notInContact: true,
+          }));
+
+        setDbSearchResults(arr);
+      } catch (_) {
+        setDbSearchResults([]);
+      }
+    }, 350);
+
+    return () => clearTimeout(timer);
+  }, [searchQuery, token, data, userData]);
+
   const filteredContacts = useMemo(() => {
     if (!searchQuery.trim()) return data;
     const q = searchQuery.toLowerCase();
-    return data.filter(
+    const localMatches = data.filter(
       (c) =>
         (c.displayName || c.name || '').toLowerCase().includes(q) ||
         (c.name || '').toLowerCase().includes(q)
     );
-  }, [data, searchQuery]);
+    if (dbSearchResults.length === 0) return localMatches;
+    return [...localMatches, ...dbSearchResults];
+  }, [data, searchQuery, dbSearchResults]);
 
   const grouped = useMemo(() => {
     const sorted = [...filteredContacts].sort((a, b) =>
@@ -443,6 +505,11 @@ const ContactListScreen = () => {
                     <Text style={styles.rowMeta} numberOfLines={1}>
                       {contact.name ? `@${contact.name}` : '—'}
                     </Text>
+                    {contact.notInContact ? (
+                      <Text style={[styles.rowMeta, { color: '#FF9E9E', marginTop: 2 }]}>
+                        This contact is not in your contacts
+                      </Text>
+                    ) : null}
                   </View>
                   <ChevronRight size={16} color={isDark ? '#3A3A50' : '#D0D0D0'} />
                 </Pressable>

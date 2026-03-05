@@ -28,8 +28,8 @@ const styles = StyleSheet.create({
         marginBottom: 10
     },
     tabsRow: {
-        marginBottom: 8,
-        marginTop: 4,
+        marginBottom: 4,
+        marginTop: 2,
     },
     ph: {
         paddingHorizontal: 5
