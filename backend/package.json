@@ -1,0 +1,61 @@
+{
+  "name": "amigo-backend",
+  "version": "1.0.0",
+  "main": "server.js",
+  "scripts": {
+    "test": "\u001b[A\u001b[B",
+    "dev": "nodemon src/index.js",
+    "start": "node src/index.js",
+    "build": "yarn install --production=false",
+    "seed:dm": "node _seed_dm_03202834184.js"
+  },
+  "author": "Umair Athar",
+  "license": "ISC",
+  "dependencies": {
+    "@aws-sdk/client-s3": "^3.896.0",
+    "@aws-sdk/client-sns": "^3.896.0",
+    "@aws-sdk/s3-request-presigner": "^3.940.0",
+    "axios": "^1.13.2",
+    "bcrypt": "^5.1.1",
+    "body-parser": "^1.20.2",
+    "colors": "^1.4.0",
+    "compression": "^1.7.5",
+    "cookie-parser": "^1.4.7",
+    "cors": "^2.8.5",
+    "crypto": "^1.0.1",
+    "dotenv": "^16.4.5",
+    "express": "^4.18.3",
+    "express-mongo-sanitize": "^2.2.0",
+    "express-rate-limit": "^8.1.0",
+    "firebase-admin": "^13.6.0",
+    "helmet": "^8.1.0",
+    "hpp": "^0.2.3",
+    "http-status": "^2.1.0",
+    "joi": "^18.0.1",
+    "jsonwebtoken": "^9.0.2",
+    "moment": "^2.30.1",
+    "mongoose": "^8.2.1",
+    "morgan": "^1.10.1",
+    "multer": "^1.4.5-lts.1",
+    "multer-s3": "^3.0.1",
+    "node-cron": "^3.0.3",
+    "nodemailer": "^6.9.12",
+    "razorpay": "^2.9.6",
+    "socket.io": "^4.7.5",
+    "xss-clean": "^0.1.4"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.9"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Ashishrajputz/amigo_backend.git"
+  },
+  "keywords": [],
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/Ashishrajputz/amigo_backend/issues"
+  },
+  "homepage": "https://github.com/Ashishrajputz/amigo_backend#readme",
+  "description": ""
+}

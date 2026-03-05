@@ -1,0 +1,71 @@
+{
+  "expo": {
+    "name": "Amigo",
+    "slug": "amigo",
+    "version": "0.0.1",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "dark",
+    "splash": {
+      "backgroundColor": "#000000",
+      "resizeMode": "contain"
+    },
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "bddec7d1-45da-46ea-ad27-090da922841b"
+      }
+    },
+    "ios": {
+      "supportsTablet": false,
+      "bundleIdentifier": "com.amigo.app",
+      "infoPlist": {
+        "NSCameraUsageDescription": "Amigo needs access to your camera to scan QR codes and take photos.",
+        "NSPhotoLibraryUsageDescription": "Amigo needs access to your photo library to share images.",
+        "NSMicrophoneUsageDescription": "Amigo needs access to your microphone to record audio messages.",
+        "NSContactsUsageDescription": "Amigo needs access to your contacts to find friends."
+      }
+    },
+    "android": {
+      "adaptiveIcon": {
+        "backgroundColor": "#000000"
+      },
+      "softwareKeyboardLayoutMode": "adjustResize",
+      "package": "com.amigo.app",
+      "googleServicesFile": "./google-services.json",
+      "permissions": [
+        "android.permission.CAMERA",
+        "android.permission.READ_CONTACTS",
+        "android.permission.RECORD_AUDIO",
+        "android.permission.READ_EXTERNAL_STORAGE",
+        "android.permission.WRITE_EXTERNAL_STORAGE",
+        "android.permission.POST_NOTIFICATIONS",
+        "android.permission.WRITE_CONTACTS",
+        "android.permission.MODIFY_AUDIO_SETTINGS"
+      ]
+    },
+    "plugins": [
+      "expo-camera",
+      "expo-contacts",
+      "expo-image-picker",
+      "expo-document-picker",
+      "expo-notifications",
+      [
+        "expo-av",
+        {
+          "microphonePermission": "Amigo needs access to your microphone to record audio messages."
+        }
+      ],
+      [
+        "expo-media-library",
+        {
+          "photosPermission": "Amigo needs access to your photos to share images.",
+          "savePhotosPermission": "Amigo needs permission to save photos."
+        }
+      ]
+    ],
+    "owner": "tanzeelnaveed"
+  }
+}
